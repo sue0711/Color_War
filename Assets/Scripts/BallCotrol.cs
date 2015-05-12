@@ -70,7 +70,11 @@ public class BallCotrol : MonoBehaviour {
     Sprite[] star;  //14개
     Sprite[] gage;  //11개
     Sprite[] border; //14개
+<<<<<<< HEAD
     public Sprite[] ColorBar; //14개
+=======
+    Sprite[] ColorBar; //15개
+>>>>>>> origin/master
 
 	void Start () {
 
@@ -108,7 +112,11 @@ public class BallCotrol : MonoBehaviour {
         star = Resources.LoadAll<Sprite>("star");  //14개
         gage = Resources.LoadAll<Sprite>("gage");  //11개
         border = Resources.LoadAll<Sprite>("teduri"); //14개
+<<<<<<< HEAD
         ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //14개
+=======
+        ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //15개
+>>>>>>> origin/master
 
         Debug.Log(player1[1]);
 	}
@@ -178,14 +186,37 @@ public class BallCotrol : MonoBehaviour {
 			bump_cnt ++;
 			ColorChange ();
 		} else if (other.gameObject.tag == this.gameObject.tag) {
+<<<<<<< HEAD
 			//ChangeBG////////////////////////////////////////////////////////////////////////
             ChangeBackground(other.gameObject.tag);
                 
+=======
+			/*
+			 * bug 1 fix
+			 */
+			if(GameObject.Equals(other.gameObject, colorBarObj)) {
+				bump_cnt++;
+				ColorChange();
+				return ;
+			}
+
+			//ChangeBG////////////////////////////////////////////////////////////////////////
+            ChangeBackground(other.gameObject.tag);
+                
+
+>>>>>>> origin/master
 			bump_cnt ++;
 			ColorChange ();
+            
+
 
 			sameColor = GameObject.FindGameObjectsWithTag(other.gameObject.tag);
 
+<<<<<<< HEAD
+=======
+            
+
+>>>>>>> origin/master
 
 			foreach (GameObject sc in sameColor) {
 				//Destroy Same Colors
@@ -237,7 +268,11 @@ public class BallCotrol : MonoBehaviour {
 
     // 공의 컬러와 컬러체인지바 같이 바꾸는 함수
 	void ColorChange(){
+<<<<<<< HEAD
 		bump_cnt = bump_cnt % 5;
+=======
+		bump_cnt = bump_cnt % 14;
+>>>>>>> origin/master
 		switch (bump_cnt)
         {
 		    case 0:
@@ -275,7 +310,11 @@ public class BallCotrol : MonoBehaviour {
                 colorBarObj.gameObject.tag = "Color5";
                 sr_ColorBar.sprite = ColorBar[Color5];
                 break;
+<<<<<<< HEAD
             /*case 5:
+=======
+            case 5:
+>>>>>>> origin/master
                 sr.sprite = player1[5];
                 this.gameObject.tag = "Color6";
 
@@ -338,7 +377,11 @@ public class BallCotrol : MonoBehaviour {
                 colorBarObj.gameObject.tag = "Color14";
                 sr_ColorBar.sprite = ColorBar[Color14];
                 break;
+<<<<<<< HEAD
 			*/
+=======
+		
+>>>>>>> origin/master
 		}
 	}
 	
