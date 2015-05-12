@@ -178,6 +178,15 @@ public class BallCotrol : MonoBehaviour {
 			bump_cnt ++;
 			ColorChange ();
 		} else if (other.gameObject.tag == this.gameObject.tag) {
+			/*
+			 * bug 1 fix
+			 */
+			if(GameObject.Equals(other.gameObject, colorBarObj)) {
+				bump_cnt++;
+				ColorChange();
+				return ;
+			}
+
 			//ChangeBG////////////////////////////////////////////////////////////////////////
             ChangeBackground(other.gameObject.tag);
                 
