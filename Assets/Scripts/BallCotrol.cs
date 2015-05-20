@@ -46,7 +46,7 @@ public class BallCotrol : MonoBehaviour {
 	public int remain_cnt;
 	public int bump_cnt;
 
-	Rigidbody2D rb;
+	public Rigidbody2D rb;
 	SpriteRenderer sr;
 	SpriteRenderer bgSr;
     SpriteRenderer sr_ColorBar;
@@ -70,11 +70,7 @@ public class BallCotrol : MonoBehaviour {
     Sprite[] star;  //14개
     Sprite[] gage;  //11개
     Sprite[] border; //14개
-<<<<<<< HEAD
     public Sprite[] ColorBar; //14개
-=======
-    Sprite[] ColorBar; //15개
->>>>>>> origin/master
 
 	void Start () {
 
@@ -112,11 +108,7 @@ public class BallCotrol : MonoBehaviour {
         star = Resources.LoadAll<Sprite>("star");  //14개
         gage = Resources.LoadAll<Sprite>("gage");  //11개
         border = Resources.LoadAll<Sprite>("teduri"); //14개
-<<<<<<< HEAD
         ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //14개
-=======
-        ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //15개
->>>>>>> origin/master
 
         Debug.Log(player1[1]);
 	}
@@ -127,38 +119,33 @@ public class BallCotrol : MonoBehaviour {
 			//init
 			arrow.SetActive(true);
             arrowTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
-			sw = 1;
-			//bump_cnt = 0;
 
-			myTransform.Rotate( 0 , 0, -Time.deltaTime*150);
+            Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10);
+            Vector3 lookPos = Camera.main.ScreenToWorldPoint(mousePos);
+            lookPos = lookPos - transform.position;
+            float angle = Mathf.Atan2(lookPos.y, lookPos.x) * Mathf.Rad2Deg;
+            myTransform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+
 			if(Input.GetMouseButtonDown(0)){
 				B_state = BallState.Clicked;
-				direction = myTransform.rotation.z;
+				direction = myTransform.localRotation.z;
 			}
 		}
 
 		if (B_state == BallState.Clicked){
-            
-			force = force + 2*sw;
-			//Debug.Log(force);
-			arrowTransform.localScale = new Vector3(force*0.015f, arrowTransform.localScale.y, arrowTransform.localScale.z);  
-			if(force >= 100){
-				sw = -1;
-			} else if (force <=40){
-				sw = 1;
-			}
-            Debug.Log("sw = " + sw);
 			if(Input.GetMouseButtonUp(0)){
-				B_state = BallState.Move;
-				//rb.velocity = new Vector2(1.0f, 1.0f);
-
-                velocity = myTransform.rotation * Vector3.right;
+				
+                force = 100;
+                velocity = myTransform.localRotation * Vector2.right;
+                Debug.Log(myTransform.localRotation * Vector2.right);
 				rb.AddForce(velocity*force*5.0f);
-				arrow.SetActive(false);
+                arrow.SetActive(false);
 			}
 		}
 
 		if (B_state == BallState.Move) {
+            
 			rb.velocity = rb.velocity * 0.995f;
             Debug.Log("rb.velocity = " + rb.velocity);
 			//Debug.Log(rb.velocity);
@@ -186,37 +173,14 @@ public class BallCotrol : MonoBehaviour {
 			bump_cnt ++;
 			ColorChange ();
 		} else if (other.gameObject.tag == this.gameObject.tag) {
-<<<<<<< HEAD
 			//ChangeBG////////////////////////////////////////////////////////////////////////
             ChangeBackground(other.gameObject.tag);
                 
-=======
-			/*
-			 * bug 1 fix
-			 */
-			if(GameObject.Equals(other.gameObject, colorBarObj)) {
-				bump_cnt++;
-				ColorChange();
-				return ;
-			}
-
-			//ChangeBG////////////////////////////////////////////////////////////////////////
-            ChangeBackground(other.gameObject.tag);
-                
-
->>>>>>> origin/master
 			bump_cnt ++;
 			ColorChange ();
-            
-
 
 			sameColor = GameObject.FindGameObjectsWithTag(other.gameObject.tag);
 
-<<<<<<< HEAD
-=======
-            
-
->>>>>>> origin/master
 
 			foreach (GameObject sc in sameColor) {
 				//Destroy Same Colors
@@ -268,11 +232,7 @@ public class BallCotrol : MonoBehaviour {
 
     // 공의 컬러와 컬러체인지바 같이 바꾸는 함수
 	void ColorChange(){
-<<<<<<< HEAD
 		bump_cnt = bump_cnt % 5;
-=======
-		bump_cnt = bump_cnt % 14;
->>>>>>> origin/master
 		switch (bump_cnt)
         {
 		    case 0:
@@ -310,11 +270,7 @@ public class BallCotrol : MonoBehaviour {
                 colorBarObj.gameObject.tag = "Color5";
                 sr_ColorBar.sprite = ColorBar[Color5];
                 break;
-<<<<<<< HEAD
             /*case 5:
-=======
-            case 5:
->>>>>>> origin/master
                 sr.sprite = player1[5];
                 this.gameObject.tag = "Color6";
 
@@ -377,11 +333,7 @@ public class BallCotrol : MonoBehaviour {
                 colorBarObj.gameObject.tag = "Color14";
                 sr_ColorBar.sprite = ColorBar[Color14];
                 break;
-<<<<<<< HEAD
 			*/
-=======
-		
->>>>>>> origin/master
 		}
 	}
 	

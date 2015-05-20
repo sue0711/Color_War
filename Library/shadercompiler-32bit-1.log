@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-Base path: E:/Program Files/Unity/Editor/Data
-Pipe name: \\.\pipe\UnityShaderCompiler-32bit-1-2492
-=======
-Base path: C:/Program Files/Unity/Editor/Data
-Pipe name: \\.\pipe\UnityShaderCompiler-32bit-1-15928
->>>>>>> origin/master
+Base path: D:/Unity5/Editor/Data
+Pipe name: \\.\pipe\UnityShaderCompiler-32bit-1-8924
 Cmd: getPlatforms
 Unhandled exception: Readfile from pipe failed. GLE=파이프가 끝났습니다.
 
