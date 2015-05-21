@@ -74,8 +74,16 @@ public class BallCotrol : MonoBehaviour
     public bool isCollided = false;
     public GameObject collidedObj;
 
+    GameObject clearCanvas;
+    GameObject GameoverCanvas;
+
     void Start()
     {
+        clearCanvas = GameObject.Find("ClearCanvas");
+        GameoverCanvas = GameObject.Find("GameoverCanvas");
+
+        clearCanvas.SetActive(false);
+        GameoverCanvas.SetActive(false);
 
         B_state = BallState.Wait;
         myTransform = this.gameObject.transform;
@@ -116,6 +124,8 @@ public class BallCotrol : MonoBehaviour
         ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //8개
 
         Debug.Log(player1[1]);
+
+        Time.timeScale = 1;
     }
 
     // Update is called once per frame
@@ -126,8 +136,9 @@ public class BallCotrol : MonoBehaviour
             if (end_cnt <= 0)
             {
                 Time.timeScale = 0;
-                clearText.text = "GameOver!";
+                //clearText.text = "GameOver!";
                 this.gameObject.SetActive(false);
+                GameoverCanvas.SetActive(true);
             }
             //init
             arrow.SetActive(true);
@@ -172,8 +183,9 @@ public class BallCotrol : MonoBehaviour
         if (remain_cnt == figures.Length)
         {
             Time.timeScale = 0;
-            clearText.text = "Clear!!!";
+            //clearText.text = "Clear!!!";
             this.gameObject.SetActive(false);
+            clearCanvas.SetActive(true);
         }
 
         if (isCollided == true)//other.gameObject.transform.localScale.x < 9.9f)
