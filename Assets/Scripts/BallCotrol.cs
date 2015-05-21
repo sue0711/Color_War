@@ -211,94 +211,49 @@ public class BallCotrol : MonoBehaviour {
 		}
 	}
 
-	public void OnCollisionEnter2D(Collision2D other){
-
-        collidedObj = other.gameObject;
-        
-       //
-
-
-		if (other.gameObject.tag != this.gameObject.tag)
+    public void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Obstacle" || other.gameObject.tag == "BlackHole" || other.gameObject.tag == "Wall")
         {
-           // isCollided = false;
-			Debug.Log ("bump!!");
-			bump_cnt ++;
-			ColorChange ();
-		}
+            collidedObj = null;
+        }
+        else
+        {
+            collidedObj = other.gameObject;
+        }
+
+        if (other.gameObject.tag != this.gameObject.tag)
+        {
+            Debug.Log("bump!!");
+            bump_cnt++;
+            ColorChange();
+        }
         else if (other.gameObject.tag == this.gameObject.tag)
         {
-            if(other.gameObject.tag != "Obstacle" && other.gameObject.tag != "Border" && other.gameObject.tag != "BlackHole")
+            if (other.gameObject.tag != "Obstacle" && other.gameObject.tag != "Border" && other.gameObject.tag != "BlackHole")
             {
                 isCollided = true;
             }
-           
+            else
+                return;
+
             Debug.Log("isCollided : " + isCollided + " 로 바뀜");
-            
-			//ChangeBG////////////////////////////////////////////////////////////////////////
-            //ChangeBackground(other.gameObject.tag);
 
-/*            other.gameObject.GetComponent<SpriteRenderer>().sortingLayerID = 0; //default
-            other.gameObject.GetComponent<CircleCollider2D>().enabled = false;
+            bump_cnt++;
+            ColorChange();
 
-            isCollided = true;
-           
-            //while(isCollided == true)//other.gameObject.transform.localScale.x < 9.9f)
-            //{
-            //    other.gameObject.transform.localScale = Vector3.Lerp(other.gameObject.transform.localScale,
-            //                                                new Vector3(10.0f, 10.0f, 1.0f), Time.deltaTime * 150 );
-            //    Debug.Log("들어옴");
-            //    if(other.gameObject.transform.localScale == new Vector3(10.0f, 10.0f, 1.0f))
-            //    {
-            //        isCollided = false;
-            //    }
-            //}
-    
-           // other.gameObject.transform.localScale.y += Time.deltaTime * 150;
-*/
+            sameColor = GameObject.FindGameObjectsWithTag(other.gameObject.tag);
 
+            rb.velocity = new Vector2(0.0f, 0.0f);
+            myTransform.position = new Vector3(0.0f, 1.65f, 0.0f);
+            B_state = BallState.Wait;
 
-           
-                
-			bump_cnt ++;
-			ColorChange ();
+        }
 
-			sameColor = GameObject.FindGameObjectsWithTag(other.gameObject.tag);
-
-
-/*			foreach (GameObject sc in sameColor) {
-				//Destroy Same Colors
-				if(sc.GetComponent<Renderer>().sortingOrder == 0){
-					for(int i = 0; i < figures.Length; i++){
-						if(figures[i].gameObject.name == sc.gameObject.name){
-							figures[i] = new GameObject("Destory");
-							figures[i].AddComponent<SpriteRenderer>();
-							remain_cnt++;
-						}
-					}
-
-					for(int i = 0; i < figures.Length; i++){
-						if(figures[i].GetComponent<Renderer>().sortingLayerID == sc.GetComponent<Renderer>().sortingLayerID){
-							Debug.Log(i + "sc.gameObject.name = " + sc.gameObject.name);
-							figures[i].GetComponent<Renderer>().sortingOrder--;
-                            Debug.Log("figures[i] = " + figures[i]);
-						}
-					}
-
-					sc.gameObject.SetActive(false);
-				}
-			//	rb.velocity = new Vector2(0.0f,0.0f);
-			//	myTransform.position = new Vector3(0.0f, 0.0f, 0.0f);
-			//	B_state = BallState.Wait;
-			}
- */    
-
-		}
-
-	}
+    }
 
     void SameColorProcess()
     {
-
         foreach (GameObject sc in sameColor)
         {
             //Destroy Same Colors
@@ -323,14 +278,11 @@ public class BallCotrol : MonoBehaviour {
                         Debug.Log("figures[i] = " + figures[i]);
                     }
                 }
-
                 sc.gameObject.SetActive(false);
             }
-            //	rb.velocity = new Vector2(0.0f,0.0f);
-            //	myTransform.position = new Vector3(0.0f, 0.0f, 0.0f);
-            //	B_state = BallState.Wait;
         }
     }
+
     void ChangeBackground(string tag)
     {
         if (tag == "Color1") { bgSr.sprite = background[Color1]; bg.gameObject.tag = "Color1"; }
