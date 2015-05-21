@@ -13,21 +13,17 @@ public enum BallState{
 public class BallCotrol : MonoBehaviour {
 
     public const int Color1 = 0;
-    public const int Color2 = 1;
-    public const int Color3 = 2;
-    public const int Color4 = 3;
-    public const int Color5 = 4;
-    public const int Color6 = 5;
-    public const int Color7 = 6;
-    public const int Color8 = 7;
-    public const int Color9 = 8;
-    public const int Color10 = 9;
-    public const int Color11 = 10;
-    public const int Color12 = 11;
-    public const int Color13 = 12;
-    public const int Color14 = 13; 
+    public const int Color3 = 1;
+    public const int Color5 = 2;
+    public const int Color7 = 3;
+    public const int Color8 = 4;
+    public const int Color10 = 5;
+    public const int Color13 = 6;
+    public const int Color14 = 7; 
     
-	public BallState B_state;
+	public int end_cnt;
+    
+    public BallState B_state;
 
 	GameObject arrow;
 	GameObject bg;
@@ -58,19 +54,20 @@ public class BallCotrol : MonoBehaviour {
     Vector3 velocity;
 
 	Text clearText;
+    Text endCnt;
 
     // Resource Array
     Sprite[] player1;
-    Sprite[] player2;   //14개
-    Sprite[] background;    //14개
-    Sprite[] circle;    //14개
-    Sprite[] hexagon;   //14개
-    Sprite[] triangle;  //14개
-    Sprite[] square;    //14개
-    Sprite[] star;  //14개
+    Sprite[] player2;   //8개
+    Sprite[] background;    //8개
+    Sprite[] circle;    //8개
+    Sprite[] hexagon;   //8개
+    Sprite[] triangle;  //8개
+    Sprite[] square;    //8개
+    Sprite[] star;  //8개
     Sprite[] gage;  //11개
-    Sprite[] border; //14개
-    public Sprite[] ColorBar; //14개
+    Sprite[] border; //8개
+    Sprite[] ColorBar; //8개
 
 	void Start () {
 
@@ -94,21 +91,23 @@ public class BallCotrol : MonoBehaviour {
 		bump_cnt = 0;
 		remain_cnt = 0;
 
-		clearText = GameObject.Find ("Canvas/Text").GetComponent<Text> ();
+        clearText = GameObject.Find("Canvas/ResultText").GetComponent<Text>();
+        endCnt = GameObject.Find("Canvas/EndCnt").GetComponent<Text>();
+        endCnt.text = end_cnt.ToString();
 
         //Sprite Array  
 
-        player1 = Resources.LoadAll<Sprite>("player_mal2/player1"); //14개
-        player2 = Resources.LoadAll<Sprite>("player_mal2/player2");   //14개
-        background = Resources.LoadAll<Sprite>("background") ;    //14개
-        circle = Resources.LoadAll<Sprite>("Circle") ;    //14개
-        hexagon = Resources.LoadAll<Sprite>("hexagon") ;   //14개
-        triangle = Resources.LoadAll<Sprite>("triangle");  //14개
-        square = Resources.LoadAll<Sprite>("square");    //14개
-        star = Resources.LoadAll<Sprite>("star");  //14개
+        player1 = Resources.LoadAll<Sprite>("player_mal2/player1"); //8개
+        player2 = Resources.LoadAll<Sprite>("player_mal2/player2");   //8개
+        background = Resources.LoadAll<Sprite>("background") ;    //8개
+        circle = Resources.LoadAll<Sprite>("Circle") ;    //8개
+        hexagon = Resources.LoadAll<Sprite>("hexagon") ;   //8개
+        triangle = Resources.LoadAll<Sprite>("triangle");  //8개
+        square = Resources.LoadAll<Sprite>("square");    //8개
+        star = Resources.LoadAll<Sprite>("star");  //8개
         gage = Resources.LoadAll<Sprite>("gage");  //11개
-        border = Resources.LoadAll<Sprite>("teduri"); //14개
-        ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //14개
+        border = Resources.LoadAll<Sprite>("teduri"); //8개
+        ColorBar = Resources.LoadAll<Sprite>("color_change_bar"); //8개
 
         Debug.Log(player1[1]);
 	}
@@ -116,7 +115,13 @@ public class BallCotrol : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (B_state == BallState.Wait) {
-			//init
+            if (end_cnt <= 0)
+            {
+                Time.timeScale = 0;
+                clearText.text = "GameOver!";
+                this.gameObject.SetActive(false);
+            }
+            //init
 			arrow.SetActive(true);
             arrowTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 
@@ -126,30 +131,31 @@ public class BallCotrol : MonoBehaviour {
             float angle = Mathf.Atan2(lookPos.y, lookPos.x) * Mathf.Rad2Deg;
             myTransform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
-
 			if(Input.GetMouseButtonDown(0)){
 				B_state = BallState.Clicked;
 				direction = myTransform.localRotation.z;
+                end_cnt--;
+                endCnt.text = end_cnt.ToString();
 			}
 		}
 
 		if (B_state == BallState.Clicked){
 			if(Input.GetMouseButtonUp(0)){
-				
+                B_state = BallState.Move;
+
                 force = 100;
                 velocity = myTransform.localRotation * Vector2.right;
-                Debug.Log(myTransform.localRotation * Vector2.right);
 				rb.AddForce(velocity*force*5.0f);
                 arrow.SetActive(false);
 			}
 		}
 
 		if (B_state == BallState.Move) {
-            
+             
 			rb.velocity = rb.velocity * 0.995f;
             Debug.Log("rb.velocity = " + rb.velocity);
 			//Debug.Log(rb.velocity);
-			Invoke ("GetVelocity",0.5f);
+			Invoke ("GetVelocity",1.0f);
 		}
 
 		if (remain_cnt == figures.Length) {
@@ -215,24 +221,18 @@ public class BallCotrol : MonoBehaviour {
     void ChangeBackground(string tag)
     {
         if (tag == "Color1") { bgSr.sprite = background[Color1]; bg.gameObject.tag = "Color1"; }
-        else if (tag == "Color2") { bgSr.sprite = background[Color2]; bg.gameObject.tag = "Color2"; } 
         else if (tag == "Color3") { bgSr.sprite = background[Color3]; bg.gameObject.tag = "Color3"; } 
-        else if (tag == "Color4") { bgSr.sprite = background[Color4]; bg.gameObject.tag = "Color4"; } 
         else if (tag == "Color5") { bgSr.sprite = background[Color5]; bg.gameObject.tag = "Color5"; } 
-        else if (tag == "Color6") { bgSr.sprite = background[Color6]; bg.gameObject.tag = "Color6"; } 
         else if (tag == "Color7") { bgSr.sprite = background[Color7]; bg.gameObject.tag = "Color7"; } 
         else if (tag == "Color8") { bgSr.sprite = background[Color8]; bg.gameObject.tag = "Color8"; } 
-        else if (tag == "Color9") { bgSr.sprite = background[Color9]; bg.gameObject.tag = "Color9"; } 
         else if (tag == "Color10") {  bgSr.sprite = background[Color10]; bg.gameObject.tag = "Color10"; } 
-        else if (tag == "Color11") { bgSr.sprite = background[Color11]; bg.gameObject.tag = "Color11"; } 
-        else if (tag == "Color12") { bgSr.sprite = background[Color12]; bg.gameObject.tag = "Color12"; } 
         else if (tag == "Color13") { bgSr.sprite = background[Color13]; bg.gameObject.tag = "Color13"; }
         else if (tag == "Color14") { bgSr.sprite = background[Color14]; bg.gameObject.tag = "Color14"; } 
     }
 
     // 공의 컬러와 컬러체인지바 같이 바꾸는 함수
 	void ColorChange(){
-		bump_cnt = bump_cnt % 5;
+		bump_cnt = bump_cnt % 8;
 		switch (bump_cnt)
         {
 		    case 0:
@@ -243,97 +243,55 @@ public class BallCotrol : MonoBehaviour {
                 sr_ColorBar.sprite = ColorBar[Color1];
 			    break;
             case 1:
-                sr.sprite = player1[1];
-                this.gameObject.tag = "Color2";
-
-                colorBarObj.gameObject.tag = "Color2";
-                sr_ColorBar.sprite = ColorBar[Color2];
-                break;
-            case 2:
                 sr.sprite = player1[2];
                 this.gameObject.tag = "Color3";
 
                 colorBarObj.gameObject.tag = "Color3";
                 sr_ColorBar.sprite = ColorBar[Color3];
                 break;
-            case 3:
-                sr.sprite = player1[3];
-                this.gameObject.tag = "Color4";
-
-                colorBarObj.gameObject.tag = "Color4";
-                sr_ColorBar.sprite = ColorBar[Color4];
-                break;
-            case 4:
+            case 2:
                 sr.sprite = player1[4];
                 this.gameObject.tag = "Color5";
 
                 colorBarObj.gameObject.tag = "Color5";
                 sr_ColorBar.sprite = ColorBar[Color5];
                 break;
-            /*case 5:
-                sr.sprite = player1[5];
-                this.gameObject.tag = "Color6";
-
-                colorBarObj.gameObject.tag = "Color6";
-                sr_ColorBar.sprite = ColorBar[Color6];
-                break;
-            case 6:
+            case 3:
                 sr.sprite = player1[6];
                 this.gameObject.tag = "Color7";
 
                 colorBarObj.gameObject.tag = "Color7";
                 sr_ColorBar.sprite = ColorBar[Color7];
                 break;
-            case 7:
+            case 4:
                 sr.sprite = player1[7];
                 this.gameObject.tag = "Color8";
 
                 colorBarObj.gameObject.tag = "Color8";
                 sr_ColorBar.sprite = ColorBar[Color8];
                 break;
-            case 8:
-                sr.sprite = player1[8];
-                this.gameObject.tag = "Color9";
-
-                colorBarObj.gameObject.tag = "Color9";
-                sr_ColorBar.sprite = ColorBar[Color9];
-                break;
-            case 9:
+            case 5:
                 sr.sprite = player1[9];
                 this.gameObject.tag = "Color10";
 
                 colorBarObj.gameObject.tag = "Color10";
                 sr_ColorBar.sprite = ColorBar[Color10];
                 break;
-            case 10:
-                sr.sprite = player1[10];
-                this.gameObject.tag = "Color11";
-
-                colorBarObj.gameObject.tag = "Color11";
-                sr_ColorBar.sprite = ColorBar[Color11];
-                break;
-            case 11:
-                sr.sprite = player1[11];
-                this.gameObject.tag = "Color12";
-
-                colorBarObj.gameObject.tag = "Color12";
-                sr_ColorBar.sprite = ColorBar[Color12];
-                break;
-            case 12:
+            case 6:
                 sr.sprite = player1[12];
                 this.gameObject.tag = "Color13";
 
                 colorBarObj.gameObject.tag = "Color13";
                 sr_ColorBar.sprite = ColorBar[Color13];
                 break;
-            case 13:
+            case 7:
                 sr.sprite = player1[13];
                 this.gameObject.tag = "Color14";
 
                 colorBarObj.gameObject.tag = "Color14";
                 sr_ColorBar.sprite = ColorBar[Color14];
                 break;
-			*/
+			
 		}
 	}
 	
