@@ -69,6 +69,9 @@ public class BallCotrol : MonoBehaviour {
     Sprite[] border; //8개
     Sprite[] ColorBar; //8개
 
+    public bool isCollided = false;
+    public GameObject collidedObj;
+
 	void Start () {
 
 		B_state = BallState.Wait;
@@ -113,8 +116,10 @@ public class BallCotrol : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		if (B_state == BallState.Wait) {
+    void Update()
+    {
+        if (B_state == BallState.Wait)
+        {
             if (end_cnt <= 0)
             {
                 Time.timeScale = 0;
@@ -122,7 +127,7 @@ public class BallCotrol : MonoBehaviour {
                 this.gameObject.SetActive(false);
             }
             //init
-			arrow.SetActive(true);
+            arrow.SetActive(true);
             arrowTransform.localScale = new Vector3(1.0f, 1.0f, 1.0f);
 
             Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10);
@@ -131,42 +136,75 @@ public class BallCotrol : MonoBehaviour {
             float angle = Mathf.Atan2(lookPos.y, lookPos.x) * Mathf.Rad2Deg;
             myTransform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
-			if(Input.GetMouseButtonDown(0)){
-				B_state = BallState.Clicked;
-				direction = myTransform.localRotation.z;
+            if (Input.GetMouseButtonDown(0))
+            {
+                B_state = BallState.Clicked;
+                direction = myTransform.localRotation.z;
                 end_cnt--;
                 endCnt.text = end_cnt.ToString();
-			}
-		}
+            }
+        }
 
-		if (B_state == BallState.Clicked){
-			if(Input.GetMouseButtonUp(0)){
+        if (B_state == BallState.Clicked)
+        {
+            if (Input.GetMouseButtonUp(0))
+            {
                 B_state = BallState.Move;
 
                 force = 100;
                 velocity = myTransform.localRotation * Vector2.right;
-				rb.AddForce(velocity*force*5.0f);
+                rb.AddForce(velocity * force * 5.0f);
                 arrow.SetActive(false);
-			}
-		}
 
-		if (B_state == BallState.Move) {
-             
-			rb.velocity = rb.velocity * 0.995f;
+                // B_state = BallState.Move;
+            }
+        }
+
+        if (B_state == BallState.Move)
+        {
+
+            rb.velocity = rb.velocity * 0.995f;
             Debug.Log("rb.velocity = " + rb.velocity);
-			//Debug.Log(rb.velocity);
-			Invoke ("GetVelocity",1.0f);
-		}
+            //Debug.Log(rb.velocity);
 
-		if (remain_cnt == figures.Length) {
-			Time.timeScale = 0;
-			clearText.text = "Clear!!!";
-			this.gameObject.SetActive(false);
-		}
-	}
+            //if(rb.velocity.x < 0.5f && rb.velocity.y < 0.5f)
+            Invoke("GetVelocity", 1.0f);
+        }
+
+        if (remain_cnt == figures.Length)
+        {
+            Time.timeScale = 0;
+            clearText.text = "Clear!!!";
+            this.gameObject.SetActive(false);
+        }
+
+        if (isCollided == true)//other.gameObject.transform.localScale.x < 9.9f)
+        {
+            collidedObj.gameObject.GetComponent<Collider2D>().enabled = false;
+            collidedObj.gameObject.GetComponent<SpriteRenderer>().sortingLayerID = 0; //default
+            collidedObj.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
+
+            collidedObj.gameObject.transform.localScale = Vector3.Lerp(collidedObj.gameObject.transform.localScale,
+                                                        new Vector3(7.0f, 7.0f, 1.0f), Time.deltaTime * 8.0f);
+            Debug.Log("들어옴");
+           
+            if (collidedObj.gameObject.transform.localScale.x >= 6.5f)
+            {
+                isCollided = false;
+                ChangeBackground(collidedObj.gameObject.tag);
+                SameColorProcess();
+            }
+        }
+
+
+    }
+
+
+
 
 	void GetVelocity(){
-		if((rb.velocity.x < 0.3f && rb.velocity.x > -0.3f)||(rb.velocity.y < 0.3f && rb.velocity.y > -0.3f)){
+		if((rb.velocity.x < 0.3f && rb.velocity.x > -0.3f)||(rb.velocity.y < 0.3f && rb.velocity.y > -0.3f))
+        {
 			rb.velocity = new Vector2(0.0f, 0.0f);
 			B_state = BallState.Wait;
             Debug.Log("GetVelocity() 실행");
@@ -174,13 +212,52 @@ public class BallCotrol : MonoBehaviour {
 	}
 
 	public void OnCollisionEnter2D(Collision2D other){
-		if (other.gameObject.tag != this.gameObject.tag) {
+
+        collidedObj = other.gameObject;
+        
+       //
+
+
+		if (other.gameObject.tag != this.gameObject.tag)
+        {
+           // isCollided = false;
 			Debug.Log ("bump!!");
 			bump_cnt ++;
 			ColorChange ();
-		} else if (other.gameObject.tag == this.gameObject.tag) {
+		}
+        else if (other.gameObject.tag == this.gameObject.tag)
+        {
+            if(other.gameObject.tag != "Obstacle" && other.gameObject.tag != "Border" && other.gameObject.tag != "BlackHole")
+            {
+                isCollided = true;
+            }
+           
+            Debug.Log("isCollided : " + isCollided + " 로 바뀜");
+            
 			//ChangeBG////////////////////////////////////////////////////////////////////////
-            ChangeBackground(other.gameObject.tag);
+            //ChangeBackground(other.gameObject.tag);
+
+/*            other.gameObject.GetComponent<SpriteRenderer>().sortingLayerID = 0; //default
+            other.gameObject.GetComponent<CircleCollider2D>().enabled = false;
+
+            isCollided = true;
+           
+            //while(isCollided == true)//other.gameObject.transform.localScale.x < 9.9f)
+            //{
+            //    other.gameObject.transform.localScale = Vector3.Lerp(other.gameObject.transform.localScale,
+            //                                                new Vector3(10.0f, 10.0f, 1.0f), Time.deltaTime * 150 );
+            //    Debug.Log("들어옴");
+            //    if(other.gameObject.transform.localScale == new Vector3(10.0f, 10.0f, 1.0f))
+            //    {
+            //        isCollided = false;
+            //    }
+            //}
+    
+           // other.gameObject.transform.localScale.y += Time.deltaTime * 150;
+*/
+
+
+           
                 
 			bump_cnt ++;
 			ColorChange ();
@@ -188,7 +265,7 @@ public class BallCotrol : MonoBehaviour {
 			sameColor = GameObject.FindGameObjectsWithTag(other.gameObject.tag);
 
 
-			foreach (GameObject sc in sameColor) {
+/*			foreach (GameObject sc in sameColor) {
 				//Destroy Same Colors
 				if(sc.GetComponent<Renderer>().sortingOrder == 0){
 					for(int i = 0; i < figures.Length; i++){
@@ -209,15 +286,51 @@ public class BallCotrol : MonoBehaviour {
 
 					sc.gameObject.SetActive(false);
 				}
-				rb.velocity = new Vector2(0.0f,0.0f);
-				myTransform.position = new Vector3(0.0f, 0.0f, 0.0f);
-				B_state = BallState.Wait;
+			//	rb.velocity = new Vector2(0.0f,0.0f);
+			//	myTransform.position = new Vector3(0.0f, 0.0f, 0.0f);
+			//	B_state = BallState.Wait;
 			}
+ */    
 
 		}
 
 	}
 
+    void SameColorProcess()
+    {
+
+        foreach (GameObject sc in sameColor)
+        {
+            //Destroy Same Colors
+            if (sc.GetComponent<Renderer>().sortingOrder == 0)
+            {
+                for (int i = 0; i < figures.Length; i++)
+                {
+                    if (figures[i].gameObject.name == sc.gameObject.name)
+                    {
+                        figures[i] = new GameObject("Destory");
+                        figures[i].AddComponent<SpriteRenderer>();
+                        remain_cnt++;
+                    }
+                }
+
+                for (int i = 0; i < figures.Length; i++)
+                {
+                    if (figures[i].GetComponent<Renderer>().sortingLayerID == sc.GetComponent<Renderer>().sortingLayerID)
+                    {
+                        Debug.Log(i + "sc.gameObject.name = " + sc.gameObject.name);
+                        figures[i].GetComponent<Renderer>().sortingOrder--;
+                        Debug.Log("figures[i] = " + figures[i]);
+                    }
+                }
+
+                sc.gameObject.SetActive(false);
+            }
+            //	rb.velocity = new Vector2(0.0f,0.0f);
+            //	myTransform.position = new Vector3(0.0f, 0.0f, 0.0f);
+            //	B_state = BallState.Wait;
+        }
+    }
     void ChangeBackground(string tag)
     {
         if (tag == "Color1") { bgSr.sprite = background[Color1]; bg.gameObject.tag = "Color1"; }
