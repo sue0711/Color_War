@@ -191,8 +191,8 @@ public class BallCotrol : MonoBehaviour
         if (isCollided == true)//other.gameObject.transform.localScale.x < 9.9f)
         {
             collidedObj.gameObject.GetComponent<Collider2D>().enabled = false;
-            collidedObj.gameObject.GetComponent<SpriteRenderer>().sortingLayerID = 0; //default
-            collidedObj.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
+        //    collidedObj.gameObject.GetComponent<SpriteRenderer>().sortingLayerID = 0; //default
+        //    collidedObj.gameObject.GetComponent<SpriteRenderer>().sortingOrder = 0;
 
             collidedObj.gameObject.transform.localScale = Vector3.Lerp(collidedObj.gameObject.transform.localScale,
                                                         new Vector3(7.0f, 7.0f, 1.0f), Time.deltaTime * 8.0f);
